@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday, Florianee!</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-pink:#F8D9E4;
+    --dot:#3E2A28;
+    --card-white:#FFF7F2;
+    --accent-pink:#E8A9BE;
+    --accent-strong:#D07C9B;
+    --gold:#D9A441;
+    --text-deep:#6B2C43;
+    --text-body:#5A4A46;
+    --bar-h: clamp(24px,5vh,46px);
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{height:100%;margin:0;overflow:hidden;}
+  body{
+    font-family:'Quicksand',sans-serif;
+    background-color:var(--bg-pink);
+    background-image:radial-gradient(var(--dot) 3.5px, transparent 3.6px);
+    background-size:34px 34px;
+  }
+  button{font:inherit;color:inherit;background:none;border:none;padding:0;margin:0;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+  button:focus-visible{outline:3px solid var(--text-deep);outline-offset:4px;}
+  .frame-bar{position:fixed;left:0;right:0;height:var(--bar-h);background:var(--card-white);z-index:50;transition:transform 1.3s cubic-bezier(.16,1,.3,1);}
+  .frame-top{top:0;transform:translateY(-100%);border-bottom:4px dashed var(--accent-pink);}
+  .frame-bottom{bottom:0;transform:translateY(100%);border-top:4px dashed var(--accent-pink);}
+  body.loaded .frame-top,body.loaded .frame-bottom{transform:translateY(0);}
+  .stage{position:fixed;top:var(--bar-h);bottom:var(--bar-h);left:0;right:0;}
+  .stage-inner{position:relative;width:100%;height:100%;}
+  .scene{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;opacity:0;pointer-events:none;transform:translateY(10px);transition:opacity .5s ease,transform .5s ease;overflow-y:auto;}
+  .scene.active{opacity:1;pointer-events:auto;transform:translateY(0);}
+  #scene-letter{justify-content:flex-start;padding-top:clamp(24px,6vh,64px);}
+  @keyframes fadeUp{to{opacity:1;transform:translateY(0);}}
+  @keyframes floatY{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+  @keyframes pulse{0%,100%{opacity:.5;}50%{opacity:1;}}
+  .invite-card{width:min(340px,86vw);background:var(--card-white);border:3px solid var(--accent-pink);border-radius:26px;padding:clamp(28px,5vw,40px) clamp(22px,5vw,32px);text-align:center;position:relative;box-shadow:0 18px 40px -12px rgba(107,44,67,.28);}
+  .invite-card::before{content:"";position:absolute;inset:8px;border:1.5px dashed rgba(232,169,190,.6);border-radius:18px;pointer-events:none;}
+  .invite-title{font-family:'Silkscreen',monospace;font-size:clamp(20px,4.2vw,28px);line-height:1.4;color:var(--text-deep);margin:0 0 14px;}
+  .invite-icon{margin:6px auto;text-align:center;}
+  .invite-icon img{width:88px;height:88px;object-fit:cover;border-radius:14px;border:3px solid var(--accent-pink);background:var(--bg-pink);display:inline-block;}
+  .invite-sub{font-size:14px;color:var(--text-body);margin:12px 0 20px;opacity:.85;}
+  .invite-cue{font-family:'Silkscreen',monospace;font-size:12px;letter-spacing:.5px;color:var(--accent-strong);animation:pulse 2s ease-in-out infinite;}
+  .envelope{width:220px;max-width:70vw;aspect-ratio:220/150;position:relative;perspective:800px;margin:0 auto 18px;animation:floatY 3s ease-in-out infinite;display:block;}
+  .envelope-body{position:absolute;inset:0;background:var(--card-white);border:3px solid var(--accent-pink);border-radius:10px;overflow:hidden;}
+  .envelope-flap{position:absolute;top:0;left:0;right:0;height:62%;background:var(--accent-strong);clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top center;transition:transform .8s cubic-bezier(.65,-0.3,.4,1.3);}
+  .envelope-seal{position:absolute;top:calc(62% - 14px);left:50%;transform:translate(-50%,-50%);width:24px;height:24px;border-radius:50%;background:var(--gold);border:2px solid var(--card-white);transition:opacity .4s ease,transform .4s ease;}
+  .envelope.opening{animation:none;}
+  .envelope.opening .envelope-flap{transform:rotateX(-170deg);}
+  .envelope.opening .envelope-seal{opacity:0;transform:translate(-50%,-50%) scale(.4);}
+  .scene-cue{font-family:'Silkscreen',monospace;font-size:12px;color:var(--accent-strong);opacity:.85;text-align:center;}
+  .letter-title{font-family:'Silkscreen',monospace;font-size:clamp(18px,3.6vw,24px);color:var(--text-deep);margin:0 0 22px;opacity:0;transform:translateY(10px);}
+  .scene.active .letter-title{animation:fadeUp .6s ease forwards;}
+  .paper{width:min(400px,88vw);min-height:48vh;background:var(--card-white);border-radius:18px 18px 6px 22px;padding:clamp(22px,5vw,34px);box-shadow:0 14px 30px -10px rgba(107,44,67,.22);display:flex;flex-direction:column;justify-content:center;gap:14px;opacity:0;transform:translateY(14px) rotate(-1deg);}
+  .scene.active .paper{animation:fadeUpPaper .65s ease .45s forwards;}
+  @keyframes fadeUpPaper{to{opacity:1;transform:translateY(0) rotate(-1deg);}}
+  .paper p{font-size:15.5px;line-height:1.7;color:var(--text-body);margin:0;max-width:56ch;}
+  .paper .signoff{font-weight:600;color:var(--text-deep);margin-top:6px;}
+  .view-more-btn{margin:26px 0 12px;font-family:'Silkscreen',monospace;font-size:13px;color:var(--card-white);background:var(--accent-strong);padding:12px 26px;border-radius:999px;opacity:0;transform:translateY(10px);box-shadow:0 10px 22px -8px rgba(208,124,155,.6);}
+  .scene.active .view-more-btn{animation:fadeUp .6s ease .95s forwards;}
+  .view-more-btn:active{transform:translateY(1px);}
+  .reveal-frame{width:min(280px,78vw);aspect-ratio:4/5;background:var(--card-white);border:4px solid var(--accent-pink);border-radius:16px;padding:8px;box-shadow:0 14px 30px -10px rgba(107,44,67,.25);opacity:0;transform:translateY(14px) scale(.95);}
+  #scene-present.active .reveal-frame{animation:frameIn .6s ease forwards;}
+  @keyframes frameIn{to{opacity:1;transform:translateY(0) scale(1);}}
+  .frame-media{position:relative;width:100%;height:100%;border-radius:10px;overflow:hidden;background:var(--bg-pink);cursor:pointer;}
+  .frame-media img{width:100%;height:100%;object-fit:cover;display:block;filter:blur(20px) saturate(1.1);transition:filter .4s ease;}
+  .frame-media.revealed img{filter:none;}
+  .frame-media::after{content:"click to reveal";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:16px;background:rgba(0,0,0,.25);color:#fff;font-family:'Silkscreen',monospace;font-size:12px;}
+  .frame-media.revealed::after{display:none;}
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;}
+  }
+</style>
+</head>
+<body>
+
+<div class="frame-bar frame-top"></div>
+<div class="frame-bar frame-bottom"></div>
+
+<div class="stage">
+  <div class="stage-inner">
+
+    <section id="scene-card" class="scene active">
+      <button class="invite-card" id="openCardBtn" aria-label="Open your birthday card">
+        <h1 class="invite-title">Happy birthday,<br>Floriane !</h1>
+        <div class="invite-icon">
+          <img src="https://static2.klipy.com/ii/8ce8357c78ea940b9c2015daf05ce1a5/3c/f2/KVKgFjD4.gif" alt="Hugs!!">
+        </div>
+        <p class="invite-sub">Made by yours truly, <br> Malvin 🙂‍↕️</p>
+        <p class="invite-cue">Click to continue</p>
+      </button>
+    </section>
+
+    <section id="scene-envelope" class="scene">
+      <button class="envelope" id="openEnvelopeBtn" aria-label="Open the letter">
+        <span class="envelope-body"></span>
+        <span class="envelope-flap"></span>
+        <span class="envelope-seal"></span>
+      </button>
+      <p class="scene-cue">Tap the envelope</p>
+    </section>
+
+    <section id="scene-letter" class="scene">
+      <h2 class="letter-title">Dear Kiwi,</h2>
+      <div class="paper">
+        <p>   You're 17 now !! meuheiehie we're now a number apart, the gap feels a lot bigger now, WHAHAHAHA 😭😭 How does being 17 feel?!?! Do you have back problems yet?!</p>
+        <p>Florianeeee, I hope you enjoy your birthday today :nod: Despite how busy you are, and how much things are going on, just remember that today is literally your BIRTHDAY, try not to stick too much to your routine and just enjoy the day.</p>
+        <p> I hope you recieve lots of love 'n the attention you deserve today, because today is your day :nod:.. Yk writing this paragraph actually made me realize how I feel like people disregarded the importance of a birthday :sob: </p>
+        <p>You're such an amazing soul,  and  I'm forever glad to have been able to both meet you, and being able to celebrate your birthday :nod: Keep perservering and never lose your way.</p>
+        <p class="signoff">With love, <br>Malvin <3 </p>
+      </div>
+      <button class="view-more-btn" id="viewMoreBtn">View more</button>
+    </section>
+
+    <section id="scene-present" class="scene">
+      <div class="reveal-frame">
+        <div class="frame-media" id="giftMedia">
+          <img src="https://i.ibb.co.com/tP8SfQJf/20260825-105502.jpg" alt="Sorry if it's sudden 😭😭">
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+  function show(id){
+    document.querySelectorAll('.scene').forEach(function(s){ s.classList.remove('active'); });
+    document.getElementById(id).classList.add('active');
+  }
+
+  document.getElementById('openCardBtn').addEventListener('click', function(){
+    show('scene-envelope');
+  });
+
+  var envelopeBtn = document.getElementById('openEnvelopeBtn');
+  envelopeBtn.addEventListener('click', function(){
+    envelopeBtn.classList.add('opening');
+    setTimeout(function(){ show('scene-letter'); }, 750);
+  });
+
+  document.getElementById('viewMoreBtn').addEventListener('click', function(){
+    show('scene-present');
+  });
+
+  document.getElementById('giftMedia').addEventListener('click', function(){
+    this.classList.toggle('revealed');
+  });
+
+  window.addEventListener('DOMContentLoaded', function(){
+    setTimeout(function(){ document.body.classList.add('loaded'); }, 300);
+  });
+</script>
+
+</body>
+</html>
